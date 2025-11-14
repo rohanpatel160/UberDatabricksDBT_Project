@@ -1,0 +1,33 @@
+resources:
+  jobs:
+    uber_bronze_silver_job:
+      name: uber_bronze_silver_job
+
+      job_clusters:
+        - job_cluster_key: shared_cluster
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"     # or any supported version
+            node_type_id: "Standard_DS3_v2"       # pick something valid in your workspace
+            num_workers: 1
+
+      tasks:
+        - task_key: bronze_ingestion
+          job_cluster_key: shared_cluster
+          notebook_task:
+            # path is relative to the bundle root; resources/ and src/ are siblings
+            notebook_path: ../src/bronze_ingestion
+            base_parameters:
+              p_catalog: ${var.catalog}
+              p_source_schema: ${var.source_schema}
+              p_bronze_schema: ${var.bronze_schema}
+
+        - task_key: silver_transformation
+          depends_on:
+            - task_key: bronze_ingestion
+          job_cluster_key: shared_cluster
+          notebook_task:
+            notebook_path: ../src/silver_transformation
+            base_parameters:
+              p_catalog: ${var.catalog}
+              p_bronze_schema: ${var.bronze_schema}
+              p_silver_schema: ${var.silver_schema}

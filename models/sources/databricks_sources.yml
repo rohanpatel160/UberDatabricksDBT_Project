@@ -1,0 +1,19 @@
+version: 2
+
+
+sources:
+  - name: source_bronze
+    database: uber_cata
+    schema: bronze
+    tables:
+      - name: trips
+
+  - name: source_silver
+    database: uber_cata
+    schema: silver
+    tables:
+      - name: customers
+      - name: drivers
+      - name: locations
+      - name: payments
+      - name: vehicles
